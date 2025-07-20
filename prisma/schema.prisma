@@ -6,3 +6,27 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model AboutMe {
+  id      String  @id @default(uuid())
+  intro   String
+  bio     String?
+  mission String?
+}
+
+model Education {
+  id           String                 @id @default(uuid())
+  title        String
+  startDate    DateTime
+  endDate      DateTime?
+  descriptions EducationDescription[]
+
+  // @@map("education") // This is the name of the table in the database
+}
+
+model EducationDescription {
+  id          String    @id @default(uuid())
+  education   Education @relation(fields: [educationId], references: [id])
+  educationId String
+  description String
+}
