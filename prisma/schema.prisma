@@ -30,3 +30,81 @@ model EducationDescription {
   educationId String
   description String
 }
+
+model Experience {
+  id               String                     @id @default(uuid())
+  company          String
+  role             String
+  startDate        DateTime
+  endDate          DateTime?
+  responsibilities ExperienceResponsibility[]
+}
+
+model ExperienceResponsibility {
+  id           String     @id @default(uuid())
+  experience   Experience @relation(fields: [experienceId], references: [id])
+  experienceId String
+  description  String
+}
+
+model Statistics {
+  id               String               @id @default(uuid())
+  startDate        DateTime
+  endDate          DateTime
+  totalSeconds     Int
+  humanReadable    String
+  languages        StatisticsLanguage[]
+  operatingSystems StatisticsOS[]
+  contributions    ContributionChart[]
+}
+
+model StatisticsLanguage {
+  id            String     @id @default(uuid())
+  statistics    Statistics @relation(fields: [statisticsId], references: [id])
+  statisticsId  String
+  language      String
+  totalSeconds  Int
+  humanReadable String
+  percent       Float
+}
+
+model StatisticsOS {
+  id            String     @id @default(uuid())
+  statistics    Statistics @relation(fields: [statisticsId], references: [id])
+  statisticsId  String
+  os            String
+  totalSeconds  Int
+  humanReadable String
+  percent       Float
+}
+
+model ContributionChart {
+  id           String     @id @default(uuid())
+  statistics   Statistics @relation(fields: [statisticsId], references: [id])
+  statisticsId String
+  date         DateTime
+  totalSeconds Int
+}
+
+model Project {
+  id          String       @id @default(uuid())
+  title       String
+  description String
+  preview     String?      @db.Text // nullable
+  logo        String?      @db.Text // nullable
+  inProgress  Boolean
+  tags        ProjectTag[]
+}
+
+model ProjectTag {
+  id        String  @id @default(uuid())
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+  tag       String
+}
+
+model Contact {
+  id    String @id @default(uuid())
+  title String
+  url   String
+}
