@@ -17,16 +17,14 @@ model AboutMe {
 model Education {
   id           String                 @id @default(uuid())
   title        String
-  startDate    DateTime
-  endDate      DateTime?
+  startDate    Int
+  endDate      Int?
   descriptions EducationDescription[]
-
-  // @@map("education") // This is the name of the table in the database
 }
 
 model EducationDescription {
   id          String    @id @default(uuid())
-  education   Education @relation(fields: [educationId], references: [id])
+  education   Education @relation(fields: [educationId], references: [id], onDelete: Cascade)
   educationId String
   description String
 }
@@ -35,22 +33,22 @@ model Experience {
   id               String                     @id @default(uuid())
   company          String
   role             String
-  startDate        DateTime
-  endDate          DateTime?
+  startDate        Int
+  endDate          Int?
   responsibilities ExperienceResponsibility[]
 }
 
 model ExperienceResponsibility {
   id           String     @id @default(uuid())
-  experience   Experience @relation(fields: [experienceId], references: [id])
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
   experienceId String
   description  String
 }
 
 model Statistics {
   id               String               @id @default(uuid())
-  startDate        DateTime
-  endDate          DateTime
+  startDate        Int
+  endDate          Int
   totalSeconds     Int
   humanReadable    String
   languages        StatisticsLanguage[]
@@ -60,7 +58,7 @@ model Statistics {
 
 model StatisticsLanguage {
   id            String     @id @default(uuid())
-  statistics    Statistics @relation(fields: [statisticsId], references: [id])
+  statistics    Statistics @relation(fields: [statisticsId], references: [id], onDelete: Cascade)
   statisticsId  String
   language      String
   totalSeconds  Int
@@ -70,7 +68,7 @@ model StatisticsLanguage {
 
 model StatisticsOS {
   id            String     @id @default(uuid())
-  statistics    Statistics @relation(fields: [statisticsId], references: [id])
+  statistics    Statistics @relation(fields: [statisticsId], references: [id], onDelete: Cascade)
   statisticsId  String
   os            String
   totalSeconds  Int
@@ -80,9 +78,9 @@ model StatisticsOS {
 
 model ContributionChart {
   id           String     @id @default(uuid())
-  statistics   Statistics @relation(fields: [statisticsId], references: [id])
+  statistics   Statistics @relation(fields: [statisticsId], references: [id], onDelete: Cascade)
   statisticsId String
-  date         DateTime
+  date         Int
   totalSeconds Int
 }
 
@@ -98,7 +96,7 @@ model Project {
 
 model ProjectTag {
   id        String  @id @default(uuid())
-  project   Project @relation(fields: [projectId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String
   tag       String
 }
