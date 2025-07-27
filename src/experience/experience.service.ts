@@ -41,8 +41,8 @@ export class ExperienceService {
     const { responsibilities, ...restPayload } = updateExperienceDto;
 
     if (responsibilities) {
-      await this.prisma.educationDescription.deleteMany({
-        where: { educationId: id },
+      await this.prisma.experienceResponsibility.deleteMany({
+        where: { experienceId: id },
       });
     }
 
