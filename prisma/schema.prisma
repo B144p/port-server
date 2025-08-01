@@ -51,6 +51,7 @@ model Statistics {
   endDate          Int
   totalSeconds     Int
   humanReadable    String
+  lastFetch        DateTime             @default(now())
   languages        StatisticsLanguage[]
   operatingSystems StatisticsOS[]
   contributions    ContributionChart[]

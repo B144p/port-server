@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "public"."Statistics" ADD COLUMN     "lastFetch" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
