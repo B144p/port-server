@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           String  @id @default(uuid())
+  email        String
+  passwordHash String
+  isSuperUser  Boolean
+}
+
 model AboutMe {
   id      String  @id @default(uuid())
   intro   String
