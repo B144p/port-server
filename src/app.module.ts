@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AboutMeModule } from './about-me/about-me.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { ContactModule } from './contact/contact.module';
 import { EducationModule } from './education/education.module';
 import { ExperienceModule } from './experience/experience.module';
@@ -14,6 +15,7 @@ import { StatisticModule } from './statistic/statistic.module';
   imports: [
     PrismaModule,
     HttpModule,
+    AuthModule,
     AboutMeModule,
     EducationModule,
     ExperienceModule,
