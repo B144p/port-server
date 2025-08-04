@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
 export const superUserSeed = async (prisma: PrismaClient) => {
@@ -6,7 +6,7 @@ export const superUserSeed = async (prisma: PrismaClient) => {
     throw new Error('Email or password not found');
   }
   console.log('Add super user => Inprogress');
-  const userInitData = {
+  const userInitData: Omit<User, 'id'> = {
     email: process.env.SEED_ADMIN_EMAIL,
     passwordHash: await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 10),
     isSuperUser: true,

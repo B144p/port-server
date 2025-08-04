@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { RouterModule } from '@nestjs/core';
 import { AboutMeModule } from './about-me/about-me.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -22,6 +23,20 @@ import { StatisticModule } from './statistic/statistic.module';
     ProjectModule,
     ContactModule,
     StatisticModule,
+    RouterModule.register([
+      {
+        path: 'v1',
+        children: [
+          { path: '', module: AuthModule },
+          { path: '', module: AboutMeModule },
+          { path: '', module: EducationModule },
+          { path: '', module: ExperienceModule },
+          { path: '', module: ProjectModule },
+          { path: '', module: ContactModule },
+          { path: '', module: StatisticModule },
+        ],
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService],
