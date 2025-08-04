@@ -1,4 +1,5 @@
 import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import { ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 
@@ -7,6 +8,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @ApiBody({ type: LoginDto })
   async login(@Body() body: LoginDto) {
     const user = await this.authService.validateUser(body);
     if (!user) throw new UnauthorizedException('Invalid credentials');

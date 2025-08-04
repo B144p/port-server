@@ -1,17 +1,18 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
-import { EducationService } from './education.service';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CreateEducationDto } from './dto/create-education.dto';
 import { UpdateEducationDto } from './dto/update-education.dto';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { EducationService } from './education.service';
 
 @Controller('education')
 export class EducationController {
@@ -19,6 +20,8 @@ export class EducationController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: CreateEducationDto })
   create(@Body() createEducationDto: CreateEducationDto) {
     return this.educationService.create(createEducationDto);
   }
@@ -35,6 +38,8 @@ export class EducationController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: UpdateEducationDto })
   update(
     @Param('id') id: string,
     @Body() updateEducationDto: UpdateEducationDto,
@@ -44,6 +49,7 @@ export class EducationController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.educationService.remove(id);
   }

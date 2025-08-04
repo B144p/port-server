@@ -8,6 +8,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
@@ -19,6 +20,8 @@ export class ExperienceController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: CreateExperienceDto })
   create(@Body() createExperienceDto: CreateExperienceDto) {
     return this.experienceService.create(createExperienceDto);
   }
@@ -35,6 +38,8 @@ export class ExperienceController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: UpdateExperienceDto })
   update(
     @Param('id') id: string,
     @Body() updateExperienceDto: UpdateExperienceDto,
@@ -44,6 +49,7 @@ export class ExperienceController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.experienceService.remove(id);
   }

@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { AboutMeService } from './about-me.service';
 import { UpdateAboutMeDto } from './dto/update-about-me.dto';
@@ -14,6 +15,8 @@ export class AboutMeController {
 
   @Patch()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: UpdateAboutMeDto })
   update(@Body() updateAboutMeDto: UpdateAboutMeDto) {
     return this.aboutMeService.update(updateAboutMeDto);
   }
