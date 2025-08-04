@@ -7,15 +7,21 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
 
-  const config = new DocumentBuilder()
-    .setTitle('API Docs: Portfolio-server')
-    .setDescription('Portfolio-server => only Rest version')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+  if (process.env.SWAGGER_ENABLED === 'true') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('API Docs: Portfolio-server')
+      .setDescription('Portfolio-server => only Rest version')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('swagger', app, document);
+    const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup(
+      process.env.SWAGGER_PATH ?? 'swagger',
+      app,
+      swaggerDocument,
+    );
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 }
