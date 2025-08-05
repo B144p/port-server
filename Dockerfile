@@ -14,6 +14,7 @@ FROM base AS build
 WORKDIR /app
 COPY . .
 COPY --from=dependencies /app/node_modules ./node_modules
+RUN pnpm dlx prisma generate
 RUN pnpm build
 
 # delete unnecessary package
