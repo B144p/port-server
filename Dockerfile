@@ -13,7 +13,6 @@ RUN pnpm install
 FROM base AS build
 WORKDIR /app
 COPY . .
-COPY .env .
 COPY --from=dependencies /app/node_modules ./node_modules
 RUN pnpm build
 
