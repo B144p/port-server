@@ -50,7 +50,7 @@ export class StatisticService {
     };
 
     return this.prisma.statistics.upsert({
-      where: { id: existingData?.id },
+      where: { id: existingData?.id ?? crypto.randomUUID() },
       create: {
         ...basePayload,
         languages: { create: payloadLanguages },
