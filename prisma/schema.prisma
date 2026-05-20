@@ -115,3 +115,9 @@ model Contact {
   title String
   url   String
 }
+
+model CorsOrigin {
+  id        String   @id @default(uuid())
+  url       String   @unique
+  createdAt DateTime @default(now())
+}
