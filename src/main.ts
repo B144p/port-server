@@ -15,6 +15,8 @@ async function bootstrap() {
       callback: (err: Error | null, allow: boolean) => void,
     ) => {
       if (!origin) return callback(null, true);
+      if (/^https?:\/\/localhost(:\d+)?$/.test(origin))
+        return callback(null, true);
       const found = await prisma.corsOrigin.findFirst({
         where: { url: origin },
       });
