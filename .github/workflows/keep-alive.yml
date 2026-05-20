@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Ping server
         run: |
-          RESPONSE=$(curl -s -w "\n%{http_code}" ${{ secrets.HEALTH_CHECK_URL }}/health)
+          RESPONSE=$(curl -s -w "\n%{http_code}" ${{ secrets.HEALTH_CHECK_URL }})
           BODY=$(echo "$RESPONSE" | head -n -1)
           STATUS=$(echo "$RESPONSE" | tail -n 1)
           echo "Response body: $BODY"
