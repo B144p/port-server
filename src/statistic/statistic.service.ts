@@ -20,7 +20,7 @@ export class StatisticService {
           orderBy: { totalSeconds: 'desc' },
         },
         contributions: {
-          orderBy: { date: 'asc' },
+          orderBy: { date: 'desc' },
           take: 366,
         },
       },
@@ -29,7 +29,12 @@ export class StatisticService {
     const IsAlreadyFetchToday =
       existingData &&
       dayjs(existingData.lastFetch).isAfter(dayjs().startOf('day'));
-    if (IsAlreadyFetchToday) return existingData;
+    if (IsAlreadyFetchToday) {
+      return {
+        ...existingData,
+        contributions: existingData.contributions.slice().reverse(),
+      };
+    }
 
     const { activity, languages, operatingSystems, contributions } =
       await this.wakaUtil.getWakaTime();
@@ -49,7 +54,7 @@ export class StatisticService {
       lastFetch: new Date(),
     };
 
-    return this.prisma.statistics.upsert({
+    const result = await this.prisma.statistics.upsert({
       where: { id: existingData?.id ?? crypto.randomUUID() },
       create: {
         ...basePayload,
@@ -80,10 +85,15 @@ export class StatisticService {
           orderBy: { totalSeconds: 'desc' },
         },
         contributions: {
-          orderBy: { date: 'asc' },
+          orderBy: { date: 'desc' },
           take: 366,
         },
       },
     });
+
+    return {
+      ...result,
+      contributions: result.contributions.slice().reverse(),
+    };
   }
 }
