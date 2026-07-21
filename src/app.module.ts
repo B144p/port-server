@@ -12,6 +12,7 @@ import { HttpModule } from './http/http.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProjectModule } from './project/project.module';
 import { StatisticModule } from './statistic/statistic.module';
+import { ViewModule } from './view/view.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { StatisticModule } from './statistic/statistic.module';
     ContactModule,
     StatisticModule,
     FrontendVersionModule,
+    ViewModule,
     RouterModule.register([
       {
         path: 'v1',

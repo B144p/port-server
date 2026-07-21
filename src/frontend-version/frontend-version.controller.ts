@@ -6,9 +6,10 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CreateFrontendVersionDto } from './dto/create-frontend-version.dto';
 import { UpdateFrontendVersionDto } from './dto/update-frontend-version.dto';
@@ -41,6 +42,18 @@ export class FrontendVersionController {
   @ApiBearerAuth()
   findAllForAdmin() {
     return this.frontendVersionService.list(true);
+  }
+
+  // Declared before `:id` — otherwise Nest would match "view-events" as an
+  // id on the routes below.
+  @Delete('view-events')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiQuery({ name: 'olderThanDays', required: false, example: 90 })
+  pruneViewEvents(@Query('olderThanDays') olderThanDays?: string) {
+    return this.frontendVersionService.pruneViewEvents(
+      olderThanDays ? Number(olderThanDays) : 90,
+    );
   }
 
   @Patch(':id')

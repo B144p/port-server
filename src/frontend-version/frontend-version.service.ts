@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ViewService } from 'src/view/view.service';
 import { CreateFrontendVersionDto } from './dto/create-frontend-version.dto';
 import { UpdateFrontendVersionDto } from './dto/update-frontend-version.dto';
 
 @Injectable()
 export class FrontendVersionService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly viewService: ViewService,
+  ) {}
 
   create(createFrontendVersionDto: CreateFrontendVersionDto) {
     return this.prisma.frontendVersion.create({
@@ -50,5 +54,13 @@ export class FrontendVersionService {
 
     await this.prisma.frontendVersion.delete({ where: { id } });
     return `This action removes a #${id} frontend version`;
+  }
+
+  // Manual retention control — raw IPs are personal data with no automated
+  // prune wired up yet (no @nestjs/schedule dependency in this repo). See
+  // the TODO in README.md for the automated-workflow follow-up.
+  async pruneViewEvents(olderThanDays: number) {
+    const { count } = await this.viewService.pruneOlderThan(olderThanDays);
+    return { deleted: count };
   }
 }
