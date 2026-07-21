@@ -101,13 +101,14 @@ model ContributionChart {
 }
 
 model Project {
-  id          String       @id @default(uuid())
+  id          String          @id @default(uuid())
   title       String
   description String
-  preview     String?      @db.Text // nullable
-  logo        String?      @db.Text // nullable
+  preview     String?         @db.Text // nullable
+  logo        String?         @db.Text // nullable
   inProgress  Boolean
   tags        ProjectTag[]
+  sources     ProjectSource[]
 }
 
 model ProjectTag {
@@ -115,6 +116,14 @@ model ProjectTag {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId String
   tag       String
+}
+
+model ProjectSource {
+  id        String  @id @default(uuid())
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  title     String
+  url       String
 }
 
 model Contact {

@@ -8,28 +8,29 @@ export class ProjectService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(createProjectDto: CreateProjectDto) {
-    const { tags, ...restPayload } = createProjectDto;
+    const { tags, sources, ...restPayload } = createProjectDto;
     return this.prisma.project.create({
       data: {
         ...restPayload,
         tags: tags?.length
           ? { create: tags.map((tag) => ({ tag })) }
           : undefined,
+        sources: sources?.length ? { create: sources } : undefined,
       },
-      include: { tags: true },
+      include: { tags: true, sources: true },
     });
   }
 
   findAll() {
     return this.prisma.project.findMany({
-      include: { tags: true },
+      include: { tags: true, sources: true },
     });
   }
 
   findOne(id: string) {
     return this.prisma.project.findUnique({
       where: { id },
-      include: { tags: true },
+      include: { tags: true, sources: true },
     });
   }
 
@@ -37,10 +38,15 @@ export class ProjectService {
     const existingData = await this.findOne(id);
     if (!existingData) throw new NotFoundException('Data not found!');
 
-    const { tags, ...restPayload } = updateProjectDto;
+    const { tags, sources, ...restPayload } = updateProjectDto;
 
     if (tags) {
       await this.prisma.projectTag.deleteMany({
+        where: { projectId: id },
+      });
+    }
+    if (sources) {
+      await this.prisma.projectSource.deleteMany({
         where: { projectId: id },
       });
     }
@@ -52,8 +58,9 @@ export class ProjectService {
         tags: tags?.length
           ? { create: tags.map((tag) => ({ tag })) }
           : undefined,
+        sources: sources?.length ? { create: sources } : undefined,
       },
-      include: { tags: true },
+      include: { tags: true, sources: true },
     });
   }
 
