@@ -48,7 +48,11 @@ async function bootstrap() {
 
     let allowed: boolean;
     try {
-      const found = await prisma.corsOrigin.findFirst({
+      // Intentionally ignores `show` — that field controls public listing
+      // visibility only. Coupling it to CORS would mean toggling a version
+      // hidden instantly breaks that frontend, which is a surprising and
+      // unwanted side effect of an unrelated admin action.
+      const found = await prisma.frontendVersion.findFirst({
         where: { url: origin },
       });
       allowed = !!found;

@@ -5,9 +5,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ContactModule } from './contact/contact.module';
-import { CorsOriginModule } from './cors-origin/cors-origin.module';
 import { EducationModule } from './education/education.module';
 import { ExperienceModule } from './experience/experience.module';
+import { FrontendVersionModule } from './frontend-version/frontend-version.module';
 import { HttpModule } from './http/http.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProjectModule } from './project/project.module';
@@ -24,7 +24,7 @@ import { StatisticModule } from './statistic/statistic.module';
     ProjectModule,
     ContactModule,
     StatisticModule,
-    CorsOriginModule,
+    FrontendVersionModule,
     RouterModule.register([
       {
         path: 'v1',
@@ -36,7 +36,7 @@ import { StatisticModule } from './statistic/statistic.module';
           { path: '', module: ProjectModule },
           { path: '', module: ContactModule },
           { path: '', module: StatisticModule },
-          { path: '', module: CorsOriginModule },
+          { path: '', module: FrontendVersionModule },
         ],
       },
     ]),

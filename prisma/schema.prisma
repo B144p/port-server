@@ -143,8 +143,25 @@ model Contact {
   url   String
 }
 
+// Deprecated — replaced by FrontendVersion, which absorbs CORS origin
+// checks. Dropped in a later, separate contract migration once
+// FrontendVersion is verified live.
 model CorsOrigin {
   id        String   @id @default(uuid())
   url       String   @unique
   createdAt DateTime @default(now())
+}
+
+model FrontendVersion {
+  id          String   @id @default(uuid())
+  key         String   @unique // e.g. "oscilloscope" — used in X-Frontend-Version
+  url         String   @unique // CORS origin
+  title       String
+  description String?
+  thumbnail   String?  @db.Text
+  show        Boolean  @default(true)
+  order       Int      @default(0)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
