@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ProjectStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsArray,
-  IsBoolean,
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -33,9 +34,9 @@ export class CreateProjectDto {
   @ApiProperty()
   logo?: string;
 
-  @IsBoolean()
-  @ApiProperty()
-  inProgress: boolean;
+  @IsEnum(ProjectStatus)
+  @ApiProperty({ enum: ProjectStatus })
+  status: ProjectStatus;
 
   @IsArray()
   @IsString({ each: true })

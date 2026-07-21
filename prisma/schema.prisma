@@ -100,13 +100,21 @@ model ContributionChart {
   totalSeconds Int
 }
 
+enum ProjectStatus {
+  IN_PROGRESS
+  ACTIVE
+  HOLD
+  PLANNING
+}
+
 model Project {
   id          String          @id @default(uuid())
   title       String
   description String
   preview     String?         @db.Text // nullable
   logo        String?         @db.Text // nullable
-  inProgress  Boolean
+  inProgress  Boolean         @default(false) // deprecated, derived from status — dropped in a later contract migration
+  status      ProjectStatus   @default(ACTIVE)
   order       Int             @default(0)
   tags        ProjectTag[]
   sources     ProjectSource[]

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, ProjectStatus } from '@prisma/client';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -10,6 +10,17 @@ export class ProjectService {
 
   private clamp(value: number, min: number, max: number) {
     return Math.min(Math.max(value, min), max);
+  }
+
+  /**
+   * @deprecated back-compat for frontends still reading the old boolean;
+   * derived from `status` and slated for removal once nothing reads it.
+   */
+  private withInProgressShim<T extends { status: ProjectStatus }>(project: T) {
+    return {
+      ...project,
+      inProgress: project.status === ProjectStatus.IN_PROGRESS,
+    };
   }
 
   // Shifts every row between currentOrder and the clamped target to make
@@ -45,10 +56,10 @@ export class ProjectService {
     return targetOrder;
   }
 
-  create(createProjectDto: CreateProjectDto) {
+  async create(createProjectDto: CreateProjectDto) {
     const { tags, sources, order, ...restPayload } = createProjectDto;
 
-    return this.prisma.$transaction(async (tx) => {
+    const created = await this.prisma.$transaction(async (tx) => {
       const count = await tx.project.count();
       // Upper clamp is `count`, not `count - 1` — that's what allows
       // appending when order is omitted.
@@ -71,26 +82,30 @@ export class ProjectService {
         include: { tags: true, sources: true },
       });
     });
+
+    return this.withInProgressShim(created);
   }
 
-  findAll() {
-    return this.prisma.project.findMany({
+  async findAll() {
+    const projects = await this.prisma.project.findMany({
       orderBy: { order: 'asc' },
       include: { tags: true, sources: true },
     });
+    return projects.map((project) => this.withInProgressShim(project));
   }
 
-  findOne(id: string) {
-    return this.prisma.project.findUnique({
+  async findOne(id: string) {
+    const project = await this.prisma.project.findUnique({
       where: { id },
       include: { tags: true, sources: true },
     });
+    return project ? this.withInProgressShim(project) : null;
   }
 
-  update(id: string, updateProjectDto: UpdateProjectDto) {
+  async update(id: string, updateProjectDto: UpdateProjectDto) {
     const { tags, sources, order, ...restPayload } = updateProjectDto;
 
-    return this.prisma.$transaction(async (tx) => {
+    const updated = await this.prisma.$transaction(async (tx) => {
       const existingData = await tx.project.findUnique({ where: { id } });
       if (!existingData) throw new NotFoundException('Data not found!');
 
@@ -119,10 +134,12 @@ export class ProjectService {
         include: { tags: true, sources: true },
       });
     });
+
+    return this.withInProgressShim(updated);
   }
 
-  reorder(id: string, order: number) {
-    return this.prisma.$transaction(async (tx) => {
+  async reorder(id: string, order: number) {
+    const reordered = await this.prisma.$transaction(async (tx) => {
       const existingData = await tx.project.findUnique({ where: { id } });
       if (!existingData) throw new NotFoundException('Data not found!');
 
@@ -138,6 +155,8 @@ export class ProjectService {
         include: { tags: true, sources: true },
       });
     });
+
+    return this.withInProgressShim(reordered);
   }
 
   remove(id: string) {
