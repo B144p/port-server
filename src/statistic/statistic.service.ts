@@ -3,12 +3,51 @@ import dayjs from 'dayjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { wakaTransformPayload, WakaUtil } from './utils';
 
+const DEFAULT_EXCLUDED_LANGUAGES = ['JSON'];
+
 @Injectable()
 export class StatisticService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly wakaUtil: WakaUtil,
   ) {}
+
+  // Read-time projection over getWakaDBData — the DB cache stays canonical
+  // and filter-independent, so a filtered request can never poison the
+  // shared WakaTime day-cache for other callers.
+  async getStatistics(exclude?: string[]) {
+    const data = await this.getWakaDBData();
+    const excludeList = exclude ?? DEFAULT_EXCLUDED_LANGUAGES;
+    const excludedSet = new Set(
+      excludeList.map((lang) => lang.trim().toLowerCase()),
+    );
+
+    const languages = data.languages.filter(
+      (lang) => !excludedSet.has(lang.language.toLowerCase()),
+    );
+    const languagesTotalSeconds = languages.reduce(
+      (sum, lang) => sum + lang.totalSeconds,
+      0,
+    );
+    // Percent is an intra-set share, so it must be recomputed against the
+    // filtered set or the remaining values no longer sum to 100. The
+    // top-level totalSeconds/humanReadable are left untouched — those
+    // answer "how much has he coded", not a property of the display filter.
+    const rescaledLanguages = languages.map((lang) => ({
+      ...lang,
+      percent:
+        languagesTotalSeconds > 0
+          ? (lang.totalSeconds / languagesTotalSeconds) * 100
+          : 0,
+    }));
+
+    return {
+      ...data,
+      languages: rescaledLanguages,
+      languagesTotalSeconds,
+      excluded: excludeList,
+    };
+  }
 
   async getWakaDBData() {
     const existingData = await this.prisma.statistics.findFirst({
