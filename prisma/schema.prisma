@@ -107,8 +107,11 @@ model Project {
   preview     String?         @db.Text // nullable
   logo        String?         @db.Text // nullable
   inProgress  Boolean
+  order       Int             @default(0)
   tags        ProjectTag[]
   sources     ProjectSource[]
+
+  @@index([order])
 }
 
 model ProjectTag {
