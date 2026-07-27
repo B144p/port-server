@@ -10,6 +10,8 @@ const CORS_CACHE_TTL_MS = 60_000;
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  app.setGlobalPrefix('v1', { exclude: ['health'] });
+
   // Express 5 defaults to the "simple" query parser, which cannot parse
   // bracketed array params like `?exclude[]=JSON`. "extended" (qs) can.
   app.set('query parser', 'extended');
