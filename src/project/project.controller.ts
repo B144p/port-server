@@ -11,6 +11,7 @@ import {
 import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { ReorderProjectDto } from './dto/reorder-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectService } from './project.service';
 
@@ -34,6 +35,17 @@ export class ProjectController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.projectService.findOne(id);
+  }
+
+  @Patch(':id/order')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: ReorderProjectDto })
+  reorder(
+    @Param('id') id: string,
+    @Body() reorderProjectDto: ReorderProjectDto,
+  ) {
+    return this.projectService.reorder(id, reorderProjectDto.order);
   }
 
   @Patch(':id')

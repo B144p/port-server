@@ -16,10 +16,17 @@ model User {
 }
 
 model AboutMe {
-  id      String  @id @default(uuid())
-  intro   String
-  bio     String?
-  mission String?
+  id           String  @id @default(uuid())
+  intro        String
+  bio          String?
+  mission      String?
+  displayName  String?
+  handle       String?
+  role         String?
+  location     String?
+  avatar       String? @db.Text
+  resumeUrl    String?
+  availability String?
 }
 
 model Education {
@@ -93,14 +100,26 @@ model ContributionChart {
   totalSeconds Int
 }
 
+enum ProjectStatus {
+  IN_PROGRESS
+  ACTIVE
+  HOLD
+  PLANNING
+}
+
 model Project {
-  id          String       @id @default(uuid())
+  id          String          @id @default(uuid())
   title       String
   description String
-  preview     String?      @db.Text // nullable
-  logo        String?      @db.Text // nullable
-  inProgress  Boolean
+  preview     String?         @db.Text // nullable
+  logo        String?         @db.Text // nullable
+  inProgress  Boolean         @default(false) // deprecated, derived from status — dropped in a later contract migration
+  status      ProjectStatus   @default(ACTIVE)
+  order       Int             @default(0)
   tags        ProjectTag[]
+  sources     ProjectSource[]
+
+  @@index([order])
 }
 
 model ProjectTag {
@@ -110,14 +129,60 @@ model ProjectTag {
   tag       String
 }
 
+model ProjectSource {
+  id        String  @id @default(uuid())
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  title     String
+  url       String
+}
+
 model Contact {
   id    String @id @default(uuid())
   title String
   url   String
 }
 
+// Deprecated — replaced by FrontendVersion, which absorbs CORS origin
+// checks. Dropped in a later, separate contract migration once
+// FrontendVersion is verified live.
 model CorsOrigin {
   id        String   @id @default(uuid())
   url       String   @unique
   createdAt DateTime @default(now())
+}
+
+model FrontendVersion {
+  id          String      @id @default(uuid())
+  key         String      @unique // e.g. "oscilloscope" — used in X-Frontend-Version
+  url         String      @unique // CORS origin
+  title       String
+  description String?
+  thumbnail   String?     @db.Text
+  show        Boolean     @default(true)
+  order       Int         @default(0)
+  views       Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  viewEvents  ViewEvent[]
+}
+
+// One row per unique (version, ip, bucket) — a visit log, not a request
+// log. Six API calls from one page load collapse into a single row via
+// the unique constraint below, which is what makes the dedupe race-safe
+// under concurrent requests (an app-level check-then-insert is not).
+model ViewEvent {
+  id             String          @id @default(uuid())
+  version        FrontendVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  versionId      String
+  ip             String
+  bucket         Int
+  userAgent      String?         @db.Text
+  referer        String?         @db.Text
+  path           String?
+  acceptLanguage String?
+  createdAt      DateTime        @default(now())
+
+  @@unique([versionId, ip, bucket])
+  @@index([versionId, createdAt])
 }
